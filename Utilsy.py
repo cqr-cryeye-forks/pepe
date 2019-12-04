@@ -66,6 +66,8 @@ class Utilsy:
 
     def check_hibp(self, email, password, elastic=False):
         print("---" + Fore.CYAN + "Have I Been Pwned" + Fore.RESET + "---")
+        pyhibp.set_user_agent(ua="pepe")
+        pyhibp.set_api_key(key='7ca6ddde2dae4228a8b1a175bbb1583e')
         to_elastic = {"email": email, "password": password, "results": []}
         try:
             resp = pyhibp.get_account_breaches(account=email, truncate_response=True)
@@ -196,15 +198,16 @@ class Utilsy:
 
     def test_mail(self, email):
         print("---" + Fore.CYAN + "Trumail" + Fore.RESET + '---')
-        req_trumail = requests.get("https://api.trumail.io/v2/lookups/json?email=" + email)
-        json_trumail = json.loads(req_trumail.content)
+        req_trumail = requests.get("https://api.trumail.io/v2/lookups/json?email=" + 'kirillkondratyukdev@gmail.com')
+        print(req_trumail.json())
+        json_trumail = req_trumail.json()
         try:
-            if not json_trumail['validFormat']:
+            if 'validFormat' not in json_trumail:
                 print(Fore.RED + "[*] Wrong email format")
                 return False
-            elif not json_trumail['deliverable']:
+            elif 'deliverable' not in json_trumail:
                 print("It seems like email address " + email + " is not deliverable")
-            elif not json_trumail['hostExists']:
+            elif 'hostExists' not in json_trumail:
                 print(email + " may be not real because host does not exists" + Fore.RESET)
             else:
                 print(Fore.GREEN + "Email test passed" + Fore.RESET)
@@ -225,9 +228,7 @@ class Utilsy:
         try:
             context = ssl.create_default_context()
             with smtplib.SMTP(smtp_server, port) as server:
-                server.ehlo()  # Can be omitted
                 server.starttls(context=context)
-                server.ehlo()  # Can be omitted
                 server.login(sender_email, account_password)
                 server.sendmail(sender_email, receiver_email, message.replace("!PASSWORD!", password))
                 print(Fore.MAGENTA + "Email has been sent successfully\n" + Fore.RESET)
